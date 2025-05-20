@@ -39,8 +39,7 @@ pip install sv_ttk pillow matplotlib
 ![image](https://github.com/user-attachments/assets/eccc5862-1307-4d1e-9ac6-162666bc1704)
 
 
-- **主窗口**：显示当前随机数、学号范围输入框、功能按钮及选项。  
-- **关于窗口**：显示版本号（v1.0）和开发者信息（LeLeawa 制作）。  
+- **主窗口**：显示当前随机数、学号范围输入框、功能按钮及选项。   
 
 
 ## 📜 更新日志  
@@ -59,7 +58,7 @@ pip install sv_ttk pillow matplotlib
 
 
 ## 📧 联系与反馈  
-- **开发者**：LeLeawa  
+- **开发者**：LeLeawa/龚奕帆
 - **邮箱**：aiwandiannaodelele@outlook.com
 - **问题反馈**：在 [GitHub Issues](https://github.com/aiwandiannaodelele/ClassPicker/issues) 提交建议或Bug报告。  
 
