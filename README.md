@@ -1,65 +1,64 @@
 
-# ClassPicker - 点的就是你  
-**一款简洁高效的随机点名工具，适用于课堂、会议等场景的快速随机选择。**  
+# ClassPicker - 点的就是你
+**A simple and efficient random name picking tool, suitable for quick random selection in classrooms, meetings, and other scenarios.**  
 
 
-## 🌟 核心功能  
-1. **随机数字选择**：可自定义学号范围（如1-45），点击按钮随机滚动并停止在某个数字。  
-2. **瞬间出结果**：勾选功能后，点击按钮直接显示最终随机数，无需动画预览。  
-3. **窗口置顶**：支持将主窗口置顶，方便在多任务环境中使用。  
+## 🌟 Core Features  
+1. **Random Number Selection**: Customize student ID range (e.g., 1-45), click the button to randomly scroll and stop at a number.  
+2. **Instant Result**: Check the option to directly display the final random number with one click, no animation preview needed.  
+3. **Window Pinning**: Keep the main window on top for easy use in multi-tasking environments.  
 
 
-## 🛠️ 技术实现  
-- **开发语言**：Python 3.x  
-- **GUI框架**：Tkinter（内置库，无需额外安装图形依赖）  
-- **主题样式**：使用 `sv_ttk` 库实现现代风格界面（需额外安装）  
-- **资源管理**：通过 `resource_path` 函数兼容开发环境与打包后的路径处理  
+## 🛠️ Technical Implementation  
+- **Programming Language**: Python 3.x  
+- **GUI Framework**: Tkinter (built-in library, no additional graphical dependencies required)  
+- **Theme Style**: Modern interface using the `sv_ttk` library (requires additional installation)  
+- **Resource Management**: Compatible path handling for development and packaged environments via the `resource_path` function  
 
 
-## 📦 安装与运行  
-### 依赖安装  
+## 📦 Installation and Run  
+### Dependency Installation  
 ```bash
 pip install sv_ttk pillow matplotlib
 ```  
 
-### 运行方式  
-1. **直接运行源代码**：  
-   - 确保 `main.py`、`icon.ico`、`icon.png` 在同一目录。  
-   - 执行 `python main.py`。  
+### How to Run  
+1. **Run Source Code Directly**:  
+   - Ensure `main.py`, `icon.ico`, and `icon.png` are in the same directory.  
+   - Execute `python main.py`.  
 
-2. **使用打包后的可执行文件**：  
-   - 使用 PyInstaller 打包（需提前安装）：  
+2. **Use Packaged Executable File**:  
+   - Pack with PyInstaller (install first):  
      ```bash
      pyinstaller --onefile --windowed --name "ClassPicker" --icon "icon.ico" --add-data "icon.png;." --add-data "icon.ico;." main.py
      ```  
-   - 运行 `dist/ClassPicker.exe`（Windows系统）。  
+   - Run `dist/ClassPicker.exe` (Windows system).  
 
 
-## 🖥️ 界面预览  
-![image](https://github.com/user-attachments/assets/eccc5862-1307-4d1e-9ac6-162666bc1704)
+## 🖥️ Interface Preview  
+![image](https://github.com/user-attachments/assets/eccc5862-1307-4d1e-9ac6-162666bc1704)  
+
+- **Main Window**: Displays the current random number, student ID range input field, function buttons, and options.  
 
 
-- **主窗口**：显示当前随机数、学号范围输入框、功能按钮及选项。   
+## 📝 Notes  
+1. **Icon Dependency**:  
+   - The program requires `icon.ico` (application icon) and `icon.png` (about window icon), which must be included via `--add-data` when packaging.  
+   - The program will still run without icon files but will show warning messages.  
+
+2. **Compatibility**:  
+   - Mainly tested on Windows 10/11, theoretically supports macOS and Linux (requires adjusting packaging parameters).  
 
 
-## 📝 注意事项  
-1. **图标依赖**：  
-   - 程序需 `icon.ico`（应用图标）和 `icon.png`（关于窗口图标），打包时需通过 `--add-data` 包含。  
-   - 若缺少图标文件，程序仍可运行，但会显示警告信息。  
-
-2. **兼容性**：  
-   - 主要测试环境为 Windows 10/11，理论支持 macOS 和 Linux（需调整打包参数）。  
+## 📧 Contact and Feedback  
+- **Developers**: LeLeawa/Gong Yifan  
+- **Email**: aiwandiannaodelele@outlook.com  
+- **Issue Reporting**: Submit suggestions or bug reports in [GitHub Issues](https://github.com/aiwandiannaodelele/ClassPicker/issues).  
 
 
-## 📧 联系与反馈  
-- **开发者**：LeLeawa/龚奕帆
-- **邮箱**：aiwandiannaodelele@outlook.com
-- **问题反馈**：在 [GitHub Issues](https://github.com/aiwandiannaodelele/ClassPicker/issues) 提交建议或Bug报告。  
-
-
-## 📄 开源协议  
-本项目采用 [MIT License]([LICENSE](https://github.com/aiwandiannaodelele/ClassPicker/blob/main/LICENSE))，欢迎贡献代码或提出改进建议！  
+## 📄 Open Source License  
+This project is licensed under the [MIT License](https://github.com/aiwandiannaodelele/ClassPicker/blob/main/LICENSE). Contributions and suggestions are welcome!  
 
 ---  
 
-**✨ 使用 ClassPicker，让随机选择更轻松！**  
+**✨ Use ClassPicker to make random selection easier!**
