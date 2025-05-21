@@ -1,5 +1,6 @@
 
 # ClassPicker - 点的就是你
+[英文]([英文](https://github.com/aiwandiannaodelele/ClassPicker/blob/main/README.md)) [中文]([中文](https://github.com/aiwandiannaodelele/ClassPicker/blob/main/README_zh.md)) 
 **A simple and efficient random name picking tool suitable for quick random selection in classrooms meetings and other scenarios.**  
 
 
