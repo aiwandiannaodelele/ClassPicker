@@ -113,7 +113,7 @@ class NumberPickerApp:
         # 显示版本信息
         about_label = ttk.Label(
             content_frame,
-            text="点的就是你 - ClassPicker v1.0.1\nLeLeawa/龚奕帆 制作",
+            text="点的就是你 - ClassPicker v1.0.1\nIvan/龚奕帆 制作",
             font=(self.font_family, 12),
             anchor='center'
         )
