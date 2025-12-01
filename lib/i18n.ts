@@ -39,6 +39,11 @@ export const translations = {
     language: "语言",
     language_zh: "简体中文",
     language_en: "English",
+    blacklist_label: "学号黑名单",
+    blacklist_placeholder: "输入学号后按回车或点击添加",
+    add_button: "添加",
+    alert_invalid_id: "请输入一个有效的学号",
+    alert_id_in_blacklist: (id: string) => `学号 ${id} 已在黑名单中`,
   },
   en: {
     title: "ClassPicker",
@@ -80,6 +85,11 @@ export const translations = {
     language: "Language",
     language_zh: "简体中文",
     language_en: "English",
+    blacklist_label: "ID Blacklist",
+    blacklist_placeholder: "Enter ID and press Enter or click Add",
+    add_button: "Add",
+    alert_invalid_id: "Please enter a valid ID",
+    alert_id_in_blacklist: (id: string) => `ID ${id} is already in the blacklist`,
   },
 };
 

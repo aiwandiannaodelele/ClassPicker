@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { RotateCcw, Upload, Users, Hash, Zap, Repeat, Info, FileText, AlertTriangle, Loader2, Settings } from 'lucide-react';
+import { RotateCcw, Upload, Users, Hash, Zap, Repeat, X, FileText, AlertTriangle, Loader2, Settings } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,24 +21,33 @@ export default function Page(): React.ReactElement {
     
     const [currentDisplay, setCurrentDisplay] = useState<string>('0');
     const [isRunning, setIsRunning] = useState<boolean>(false);
-    const [maxId, setMaxId] = useState<number>(45);
     const [studentList, setStudentList] = useState<string[]>([]);
-    const [mode, setMode] = useState<'id' | 'list'>('id');
-    const [isInstant, setIsInstant] = useState<boolean>(false);
-    const [isNoRepeat, setIsNoRepeat] = useState<boolean>(false);
     const [selectedHistory, setSelectedHistory] = useState<string[]>([]);
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>('');
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [newBlacklistItem, setNewBlacklistItem] = useState('');
+
+    // Persisted state
+    const [maxId, setMaxId] = useLocalStorage<number>('maxId', 45);
+    const [mode, setMode] = useLocalStorage<'id' | 'list'>('mode', 'id');
+    const [isInstant, setIsInstant] = useLocalStorage<boolean>('isInstant', false);
+    const [isNoRepeat, setIsNoRepeat] = useLocalStorage<boolean>('isNoRepeat', false);
+    const [blacklist, setBlacklist] = useLocalStorage<string[]>('blacklist', []);
 
     const intervalRef = useRef<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const displayRef = useRef<HTMLDivElement | null>(null);
 
+    const blacklistedItems = useMemo(() => new Set(blacklist), [blacklist]);
+
     const allItems = useMemo(() => {
-        if (mode === 'id') return Array.from({ length: maxId }, (_, i) => String(i + 1));
+        if (mode === 'id') {
+            const allIds = Array.from({ length: maxId }, (_, i) => String(i + 1));
+            return allIds.filter(id => !blacklistedItems.has(id));
+        }
         return studentList;
-    }, [mode, maxId, studentList]);
+    }, [mode, maxId, studentList, blacklistedItems]);
 
     const remainingItems = useMemo(() => {
         if (isNoRepeat) return allItems.filter(item => !selectedHistory.includes(item));
@@ -57,7 +67,7 @@ export default function Page(): React.ReactElement {
         setIsRunning(false);
         if (mode === 'id') setCurrentDisplay(t('display_range', maxId));
         else setCurrentDisplay(studentList.length > 0 ? t('display_total', studentList.length) : t('display_upload_prompt'));
-    }, [mode, maxId, studentList, t]);
+    }, [mode, maxId, studentList.length, t]);
 
     useEffect(() => {
         resetGame();
@@ -75,6 +85,24 @@ export default function Page(): React.ReactElement {
         setAlertMessage(message);
         setShowAlert(true);
     }, []);
+
+    const handleAddBlacklistItem = () => {
+        const trimmedItem = newBlacklistItem.trim();
+        if (!trimmedItem) {
+            displayAlert(t('alert_invalid_id'));
+            return;
+        }
+        if (blacklist.includes(trimmedItem)) {
+            displayAlert(t('alert_id_in_blacklist', trimmedItem));
+            return;
+        }
+        setBlacklist([...blacklist, trimmedItem]);
+        setNewBlacklistItem('');
+    };
+
+    const handleRemoveBlacklistItem = (itemToRemove: string) => {
+        setBlacklist(blacklist.filter(item => item !== itemToRemove));
+    };
 
     const pickWinner = useCallback((candidates: string[]) => {
         if (candidates.length === 0) {
@@ -181,29 +209,54 @@ export default function Page(): React.ReactElement {
 
     return (
         <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 select-none" onContextMenu={(e) => e.preventDefault()}>
-            <Card className="w-full max-w-sm sm:max-w-md animate-in fade-in slide-in-from-bottom-6 duration-700">
-                <CardHeader className="flex flex-row items-center justify-between animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+            <Card className="w-full max-w-sm sm:max-w-md">
+                <CardHeader className="flex flex-row items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Zap className="text-primary fill-primary/10" />
                         <CardTitle>{t('title')}</CardTitle>
                     </div>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" aria-label={t('settings')}>
+                            <Button variant="ghost" size="icon" aria-label={t('settings')} className="cursor-pointer">
                                 <Settings className="h-5 w-5" />
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-xs">
+                        <DialogContent className="sm:max-w-md">
                             <DialogHeader>
                                 <DialogTitle>{t('settings')}</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-4 py-4">
+                            <div className="space-y-6 py-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="blacklist">{t('blacklist_label')}</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="blacklist"
+                                            placeholder={t('blacklist_placeholder')}
+                                            value={newBlacklistItem}
+                                            onChange={(e) => setNewBlacklistItem(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleAddBlacklistItem()}
+                                        />
+                                        <Button onClick={handleAddBlacklistItem} className="cursor-pointer">{t('add_button')}</Button>
+                                    </div>
+                                    {blacklist.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            {blacklist.map(item => (
+                                                <Badge key={item} variant="secondary" className="flex items-center gap-1">
+                                                    {item}
+                                                    <button onClick={() => handleRemoveBlacklistItem(item)} className="rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer">
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="flex items-center justify-between">
                                     <Label>{t('language')}</Label>
                                     <Tabs value={language} onValueChange={(value) => setLanguage(value as 'zh' | 'en')} className="w-[180px]">
                                         <TabsList className="grid w-full grid-cols-2">
-                                            <TabsTrigger value="zh">{t('language_zh')}</TabsTrigger>
-                                            <TabsTrigger value="en">{t('language_en')}</TabsTrigger>
+                                            <TabsTrigger value="zh" className="cursor-pointer">{t('language_zh')}</TabsTrigger>
+                                            <TabsTrigger value="en" className="cursor-pointer">{t('language_en')}</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                 </div>
@@ -215,7 +268,7 @@ export default function Page(): React.ReactElement {
                     </Dialog>
                 </CardHeader>
 
-                <CardContent className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
+                <CardContent className="space-y-6">
                     <div className="relative group">
                         <div ref={displayRef} className={cn("h-48 rounded-lg flex items-center justify-center transition-all duration-300 ease-out transform scale-100 shadow-inner border", !isRunning && isNoRepeat && selectedHistory.includes(currentDisplay) ? 'bg-primary/10 border-primary' : 'bg-muted/50 border-border')}>
                             {isRunning && !isInstant && <Loader2 className="absolute h-8 w-8 text-primary animate-spin" />}
@@ -233,14 +286,14 @@ export default function Page(): React.ReactElement {
                     <div className="flex gap-3">
                         <Button
                             onClick={handleToggle}
-                            className="flex-1 h-12 text-lg"
+                            className="flex-1 h-12 text-lg cursor-pointer"
                             variant={isRunning ? "destructive" : "default"}
                             disabled={isUploading || (isNoRepeat && remainingItems.length === 0)}
                         >
                             {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('loading_button')}</> : (isRunning ? t('stop_button') : t('start_button'))}
                         </Button>
                         {isNoRepeat && (
-                            <Button onClick={resetGame} variant="outline" size="icon" className="h-12 w-12" aria-label={t('reset_button_label')} disabled={isRunning || isUploading}>
+                            <Button onClick={resetGame} variant="outline" size="icon" className="h-12 w-12 cursor-pointer" aria-label={t('reset_button_label')} disabled={isRunning || isUploading}>
                                 <RotateCcw className="h-5 w-5" />
                             </Button>
                         )}
@@ -248,8 +301,8 @@ export default function Page(): React.ReactElement {
 
                     <Tabs value={mode} onValueChange={(v) => setMode(v as 'id' | 'list')} className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="id" disabled={isRunning}><Hash className="h-4 w-4 mr-2" />{t('id_mode_tab')}</TabsTrigger>
-                            <TabsTrigger value="list" disabled={isRunning}><Users className="h-4 w-4 mr-2" />{t('list_mode_tab')}</TabsTrigger>
+                            <TabsTrigger value="id" disabled={isRunning} className="cursor-pointer"><Hash className="h-4 w-4 mr-2" />{t('id_mode_tab')}</TabsTrigger>
+                            <TabsTrigger value="list" disabled={isRunning} className="cursor-pointer"><Users className="h-4 w-4 mr-2" />{t('list_mode_tab')}</TabsTrigger>
                         </TabsList>
                         <TabsContent value="id" className="mt-4 space-y-4">
                              <div className="flex items-center justify-between">
@@ -257,9 +310,9 @@ export default function Page(): React.ReactElement {
                                     <Hash className="h-4 w-4" /> {t('id_range_label', maxId)}
                                 </Label>
                                 <div className="flex items-center gap-1">
-                                    <Button variant="outline" size="icon" onClick={() => setMaxId(p => Math.max(1, p - 1))} disabled={isRunning}><span className="sr-only">-</span>-</Button>
+                                    <Button variant="outline" size="icon" onClick={() => setMaxId(p => Math.max(1, p - 1))} disabled={isRunning} className="cursor-pointer"><span className="sr-only">-</span>-</Button>
                                     <Input id="maxId" type="number" value={maxId} onChange={(e) => setMaxId(Math.max(1, parseInt(e.target.value) || 1))} className="w-16 text-center" min="1" disabled={isRunning} />
-                                    <Button variant="outline" size="icon" onClick={() => setMaxId(p => p + 1)} disabled={isRunning}><span className="sr-only">+</span>+</Button>
+                                    <Button variant="outline" size="icon" onClick={() => setMaxId(p => p + 1)} disabled={isRunning} className="cursor-pointer"><span className="sr-only">+</span>+</Button>
                                 </div>
                             </div>
                         </TabsContent>
@@ -268,7 +321,7 @@ export default function Page(): React.ReactElement {
                                 <Label className="flex items-center gap-2"><FileText className="h-4 w-4" />{t('list_file_label')}</Label>
                                 <Badge variant="secondary">{t('list_file_count', studentList.length)}</Badge>
                             </div>
-                            <Button variant="outline" className="w-full border-dashed" onClick={() => fileInputRef.current?.click()} disabled={isRunning || isUploading}>
+                            <Button variant="outline" className="w-full border-dashed cursor-pointer" onClick={() => fileInputRef.current?.click()} disabled={isRunning || isUploading}>
                                 {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('reading_file_button_text')}</> : <><Upload className="mr-2 h-4 w-4" />{studentList.length > 0 ? t('replace_list_button_text') : t('upload_button_text')}</>}
                             </Button>
                             <Input type="file" ref={fileInputRef} className="hidden" accept=".txt" onChange={handleFileUpload} disabled={isRunning || isUploading} />
@@ -278,12 +331,12 @@ export default function Page(): React.ReactElement {
                     <Card className="p-5">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="instant-mode" className="flex items-center gap-3"><Zap className="h-5 w-5" />{t('instant_mode_label')}</Label>
-                                <Switch id="instant-mode" checked={isInstant} onCheckedChange={setIsInstant} disabled={isRunning} />
+                                <Label htmlFor="instant-mode" className="flex items-center gap-3 cursor-pointer"><Zap className="h-5 w-5" />{t('instant_mode_label')}</Label>
+                                <Switch id="instant-mode" checked={isInstant} onCheckedChange={setIsInstant} disabled={isRunning} className="cursor-pointer"/>
                             </div>
                              <div className="flex items-center justify-between">
-                                <Label htmlFor="no-repeat-mode" className="flex items-center gap-3"><Repeat className="h-5 w-5" />{t('no_repeat_mode_label')}</Label>
-                                <Switch id="no-repeat-mode" checked={isNoRepeat} onCheckedChange={setIsNoRepeat} disabled={isRunning} />
+                                <Label htmlFor="no-repeat-mode" className="flex items-center gap-3 cursor-pointer"><Repeat className="h-5 w-5" />{t('no_repeat_mode_label')}</Label>
+                                <Switch id="no-repeat-mode" checked={isNoRepeat} onCheckedChange={setIsNoRepeat} disabled={isRunning} className="cursor-pointer"/>
                             </div>
                         </div>
                     </Card>
@@ -313,7 +366,7 @@ export default function Page(): React.ReactElement {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogAction className="w-full" onClick={() => setShowAlert(false)}>{t('alert_confirm')}</AlertDialogAction>
+                        <AlertDialogAction className="w-full cursor-pointer" onClick={() => setShowAlert(false)}>{t('alert_confirm')}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

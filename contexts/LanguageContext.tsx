@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { translations, Language } from '@/lib/i18n';
 
 type TranslationKey = keyof (typeof translations)['zh'];
@@ -16,6 +16,18 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('zh');
 
+  useEffect(() => {
+    const savedLanguage = window.localStorage.getItem('language') as Language;
+    if (savedLanguage && translations[savedLanguage]) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
+
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    window.localStorage.setItem('language', lang);
+  };
+
   const t = (key: TranslationKey, ...args: any[]): string => {
     const translation = translations[language][key];
     if (typeof translation === 'function') {
@@ -25,7 +37,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -1,5 +1,4 @@
 'use client'
-import { inter } from "./fonts";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +13,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <html lang={language}>
-            <body className={cn("antialiased", inter.className)}>
+            <body className={cn("font-sans antialiased")}>
                 {children}
             </body>
         </html>
