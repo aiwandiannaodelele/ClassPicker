@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { RotateCcw, Upload, Users, Hash, Zap, Repeat, X, FileText, AlertTriangle, Loader2, Settings } from 'lucide-react';
+import { RotateCcw, Upload, Users, Hash, Repeat, X, FileText, AlertTriangle, Loader2, Settings, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useLocalStorage from '@/hooks/useLocalStorage';
 
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
@@ -212,7 +212,7 @@ export default function Page(): React.ReactElement {
             <Card className="w-full max-w-sm sm:max-w-md">
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <Zap className="text-primary fill-primary/10" />
+                        <img src="/icon.png" alt="App Icon" className="h-6 w-6" />
                         <CardTitle>{t('title')}</CardTitle>
                     </div>
                     <Dialog>
