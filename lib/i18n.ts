@@ -44,6 +44,11 @@ export const translations = {
     add_button: "添加",
     alert_invalid_id: "请输入一个有效的学号",
     alert_id_in_blacklist: (id: string) => `学号 ${id} 已在黑名单中`,
+    sound_effect_label: "抽中音效",
+    sound_effect_none: "无",
+    sound_effect_applause: "鼓掌",
+    sound_effect_pop: "咕噜",
+    sound_effect_firework: "烟花礼炮",
   },
   en: {
     title: "ClassPicker",
@@ -90,6 +95,11 @@ export const translations = {
     add_button: "Add",
     alert_invalid_id: "Please enter a valid ID",
     alert_id_in_blacklist: (id: string) => `ID ${id} is already in the blacklist`,
+    sound_effect_label: "Sound Effect",
+    sound_effect_none: "None",
+    sound_effect_applause: "Applause",
+    sound_effect_pop: "Pop",
+    sound_effect_firework: "Firework",
   },
 };
 

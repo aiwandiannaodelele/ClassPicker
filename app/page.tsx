@@ -14,7 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+
+type SoundEffect = 'none' | 'applause' | 'pop' | 'firework';
 
 export default function Page(): React.ReactElement {
     const { language, setLanguage, t } = useLanguage();
@@ -34,6 +37,7 @@ export default function Page(): React.ReactElement {
     const [isInstant, setIsInstant] = useLocalStorage<boolean>('isInstant', false);
     const [isNoRepeat, setIsNoRepeat] = useLocalStorage<boolean>('isNoRepeat', false);
     const [blacklist, setBlacklist] = useLocalStorage<string[]>('blacklist', []);
+    const [soundEffect, setSoundEffect] = useLocalStorage<SoundEffect>('soundEffect', 'pop');
 
     const intervalRef = useRef<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -54,6 +58,12 @@ export default function Page(): React.ReactElement {
         return allItems;
     }, [allItems, isNoRepeat, selectedHistory]);
 
+    const playSound = useCallback(() => {
+        if (soundEffect === 'none') return;
+        const audio = new Audio(`/sounds/${soundEffect}.wav`);
+        audio.play().catch(error => console.error("Audio play failed:", error));
+    }, [soundEffect]);
+
     const stopAnimation = () => {
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
@@ -72,6 +82,10 @@ export default function Page(): React.ReactElement {
     useEffect(() => {
         resetGame();
     }, [mode, studentList.length, maxId, resetGame]);
+    
+    useEffect(() => {
+        document.title = t('title');
+    }, [t]);
 
     const getFontSize = (text: string): string => {
         const len = String(text).length;
@@ -111,6 +125,7 @@ export default function Page(): React.ReactElement {
         }
         const winner = candidates[Math.floor(Math.random() * candidates.length)];
         setCurrentDisplay(winner);
+        playSound();
 
         if (isNoRepeat) {
             setSelectedHistory(prev => {
@@ -130,7 +145,7 @@ export default function Page(): React.ReactElement {
                 displayRef.current?.classList.add('scale-100');
             }, 400);
         }
-    }, [allItems.length, isNoRepeat, displayAlert, t]);
+    }, [allItems.length, isNoRepeat, displayAlert, t, playSound]);
 
     const handleStop = useCallback(() => {
         stopAnimation();
@@ -203,10 +218,6 @@ export default function Page(): React.ReactElement {
         e.target.value = '';
     };
 
-    useEffect(() => {
-        document.documentElement.lang = language;
-    }, [language]);
-
     return (
         <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 select-none" onContextMenu={(e) => e.preventDefault()}>
             <Card className="w-full max-w-sm sm:max-w-md">
@@ -250,6 +261,20 @@ export default function Page(): React.ReactElement {
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label>{t('sound_effect_label')}</Label>
+                                    <Select value={soundEffect} onValueChange={(value: SoundEffect) => setSoundEffect(value)}>
+                                        <SelectTrigger className="w-[180px] cursor-pointer">
+                                            <SelectValue placeholder={t('sound_effect_label')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none" className="cursor-pointer">{t('sound_effect_none')}</SelectItem>
+                                            <SelectItem value="pop" className="cursor-pointer">{t('sound_effect_pop')}</SelectItem>
+                                            <SelectItem value="applause" className="cursor-pointer">{t('sound_effect_applause')}</SelectItem>
+                                            <SelectItem value="firework" className="cursor-pointer">{t('sound_effect_firework')}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <Label>{t('language')}</Label>
