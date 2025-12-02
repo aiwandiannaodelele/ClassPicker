@@ -82,10 +82,6 @@ export default function Page(): React.ReactElement {
     useEffect(() => {
         resetGame();
     }, [mode, studentList.length, maxId, resetGame]);
-    
-    useEffect(() => {
-        document.title = t('title');
-    }, [t]);
 
     const getFontSize = (text: string): string => {
         const len = String(text).length;
