@@ -50,6 +50,7 @@ export const translations = {
     sound_effect_pop: "咕噜",
     sound_effect_firework: "烟花礼炮",
     version: "版本",
+    general_settings: "常规设置",
   },
   en: {
     title: "ClassPicker",
@@ -102,6 +103,7 @@ export const translations = {
     sound_effect_pop: "Pop",
     sound_effect_firework: "Firework",
     version: "Version",
+    general_settings: "General Settings",
   },
 };
 
