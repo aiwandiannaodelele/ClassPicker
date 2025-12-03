@@ -282,6 +282,7 @@ export default function Page(): React.ReactElement {
                                     </Tabs>
                                 </div>
                                 <p className="text-xs text-muted-foreground text-center pt-4">
+                                    {t('version')} 2.0.0<br />
                                     {t('about_author')} aiwandiannaodelele/龚奕帆 <br /> {t('mit_license')}
                                 </p>
                             </div>
