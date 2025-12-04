@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { RotateCcw, Upload, Users, Hash, Repeat, X, FileText, AlertTriangle, Loader2, Settings, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { PWAFeatures } from '@/components/PWAComponents';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -234,12 +233,6 @@ export default function Page(): React.ReactElement {
                                 <DialogTitle>{t('settings')}</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-6 py-4">
-                                <Tabs defaultValue="general" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="general" className="cursor-pointer">{t('general_settings')}</TabsTrigger>
-                                        <TabsTrigger value="pwa" className="cursor-pointer">PWA</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="general" className="space-y-6 mt-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="blacklist">{t('blacklist_label')}</Label>
                                     <div className="flex gap-2">
@@ -289,14 +282,9 @@ export default function Page(): React.ReactElement {
                                     </Tabs>
                                 </div>
                                 <p className="text-xs text-muted-foreground text-center pt-4">
-                                    {t('version')} 2.0.0<br />
+                                    v2.0.0<br />
                                     {t('about_author')} aiwandiannaodelele/龚奕帆 <br /> {t('mit_license')}
                                 </p>
-                                    </TabsContent>
-                                    <TabsContent value="pwa" className="space-y-4 mt-4">
-                                        <PWAFeatures />
-                                    </TabsContent>
-                                </Tabs>
                             </div>
                         </DialogContent>
                     </Dialog>
