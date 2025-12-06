@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Language } from '@/lib/i18n';
 
 type SoundEffect = 'none' | 'applause' | 'pop' | 'firework';
 
@@ -356,12 +357,17 @@ export default function Page(): React.ReactElement {
                         </div>
                         <div className="flex items-center justify-between">
                             <Label>{t('language')}</Label>
-                            <Tabs value={language} onValueChange={(value) => setLanguage(value as 'zh' | 'en')} className="w-[180px]">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="zh" className="cursor-pointer">{t('language_zh')}</TabsTrigger>
-                                    <TabsTrigger value="en" className="cursor-pointer">{t('language_en')}</TabsTrigger>
-                                </TabsList>
-                            </Tabs>
+                            <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
+                                <SelectTrigger className="w-[180px] cursor-pointer">
+                                    <SelectValue placeholder={t('language')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="zh" className="cursor-pointer">{t('language_zh')}</SelectItem>
+                                    <SelectItem value="en" className="cursor-pointer">{t('language_en')}</SelectItem>
+                                    <SelectItem value="ja" className="cursor-pointer">{t('language_ja')}</SelectItem>
+                                    <SelectItem value="ko" className="cursor-pointer">{t('language_ko')}</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <p className="text-xs text-muted-foreground text-center pt-4">
                             v2.0.0<br />
