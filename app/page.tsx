@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { RotateCcw, Upload, Users, Hash, Repeat, X, FileText, AlertTriangle, Loader2, Settings, Zap } from 'lucide-react';
+import { RotateCcw, Upload, Users, Hash, Repeat, X, FileText, AlertTriangle, Loader2, Settings, Zap, ShieldCheck, FileBadge, HelpCircle, History } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useLocalStorage from '@/hooks/useLocalStorage';
 
@@ -12,13 +12,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { OnboardingGuide } from '@/components/OnboardingGuide';
+import { LegalDocs } from '@/components/LegalDocs';
 import { cn } from "@/lib/utils";
 import { Language } from '@/lib/i18n';
 
 type SoundEffect = 'none' | 'applause' | 'pop' | 'firework';
+type LegalDocType = 'privacy' | 'terms';
+type RollHistoryItem = {
+    name: string;
+    time: string;
+};
 
 export default function Page(): React.ReactElement {
     const { language, setLanguage, t } = useLanguage();
@@ -31,6 +39,12 @@ export default function Page(): React.ReactElement {
     const [alertMessage, setAlertMessage] = useState<string>('');
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [newBlacklistItem, setNewBlacklistItem] = useState('');
+    
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [isGuideOpen, setIsGuideOpen] = useState(false);
+    const [isLegalDocOpen, setIsLegalDocOpen] = useState(false);
+    const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocType>('privacy');
 
     // Persisted state
     const [maxId, setMaxId] = useLocalStorage<number>('maxId', 45);
@@ -39,10 +53,34 @@ export default function Page(): React.ReactElement {
     const [isNoRepeat, setIsNoRepeat] = useLocalStorage<boolean>('isNoRepeat', false);
     const [blacklist, setBlacklist] = useLocalStorage<string[]>('blacklist', []);
     const [soundEffect, setSoundEffect] = useLocalStorage<SoundEffect>('soundEffect', 'none');
+    const [hasOnboarded, setHasOnboarded] = useLocalStorage<boolean>('hasOnboarded', false);
+    const [rollHistory, setRollHistory] = useLocalStorage<RollHistoryItem[]>('rollHistory', []);
 
     const intervalRef = useRef<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const displayRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!hasOnboarded) {
+            setTimeout(() => setIsGuideOpen(true), 100);
+        }
+    }, [hasOnboarded]);
+
+    const handleShowGuide = () => {
+        setIsSettingsOpen(false);
+        setTimeout(() => setIsGuideOpen(true), 150);
+    };
+
+    const handleShowLegalDoc = (docType: LegalDocType) => {
+        setIsSettingsOpen(false);
+        setActiveLegalDoc(docType);
+        setTimeout(() => setIsLegalDocOpen(true), 150);
+    };
+
+    const handleClearHistory = () => {
+        setRollHistory([]);
+        setIsHistoryOpen(false);
+    };
 
     const blacklistedItems = useMemo(() => new Set(blacklist), [blacklist]);
 
@@ -124,6 +162,12 @@ export default function Page(): React.ReactElement {
         setCurrentDisplay(winner);
         playSound();
 
+        const newHistoryItem = {
+            name: winner,
+            time: new Date().toLocaleString(),
+        };
+        setRollHistory(prev => [newHistoryItem, ...prev]);
+
         if (isNoRepeat) {
             setSelectedHistory(prev => {
                 const newHistory = [...prev, winner];
@@ -142,7 +186,7 @@ export default function Page(): React.ReactElement {
                 displayRef.current?.classList.add('scale-100');
             }, 400);
         }
-    }, [allItems.length, isNoRepeat, displayAlert, t, playSound]);
+    }, [allItems.length, isNoRepeat, displayAlert, t, playSound, setRollHistory]);
 
     const handleStop = useCallback(() => {
         stopAnimation();
@@ -305,77 +349,130 @@ export default function Page(): React.ReactElement {
                 </Card>
             </main>
 
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label={t('settings')} className="cursor-pointer fixed bottom-4 right-4">
-                        <Settings className="h-5 w-5" />
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>{t('settings')}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-6 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="blacklist">{t('blacklist_label')}</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="blacklist"
-                                    placeholder={t('blacklist_placeholder')}
-                                    value={newBlacklistItem}
-                                    onChange={(e) => setNewBlacklistItem(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleAddBlacklistItem()}
-                                />
-                                <Button onClick={handleAddBlacklistItem} className="cursor-pointer">{t('add_button')}</Button>
-                            </div>
-                            {blacklist.length > 0 && (
-                                <div className="flex flex-wrap gap-2 pt-2">
-                                    {blacklist.map(item => (
-                                        <Badge key={item} variant="secondary" className="flex items-center gap-1">
-                                            {item}
-                                            <button onClick={() => handleRemoveBlacklistItem(item)} className="rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer">
-                                                <X className="h-3 w-3" />
-                                            </button>
-                                        </Badge>
+            <div className="fixed bottom-4 right-4 flex gap-2">
+                <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label={t('roll_history')} className="cursor-pointer">
+                            <History className="h-5 w-5" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>{t('roll_history')}</DialogTitle>
+                        </DialogHeader>
+                        <div className="max-h-[60vh] overflow-y-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t('roll_history_name')}</TableHead>
+                                        <TableHead className="text-right">{t('roll_history_time')}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {rollHistory.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-medium">{item.name}</TableCell>
+                                            <TableCell className="text-right">{item.time}</TableCell>
+                                        </TableRow>
                                     ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={handleClearHistory} disabled={rollHistory.length === 0} className="cursor-pointer">{t('roll_history_clear')}</Button>
+                            <DialogClose asChild>
+                                <Button className="cursor-pointer">{t('close')}</Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label={t('settings')} className="cursor-pointer">
+                            <Settings className="h-5 w-5" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>{t('settings')}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-6 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="blacklist">{t('blacklist_label')}</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="blacklist"
+                                        placeholder={t('blacklist_placeholder')}
+                                        value={newBlacklistItem}
+                                        onChange={(e) => setNewBlacklistItem(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAddBlacklistItem()}
+                                    />
+                                    <Button onClick={handleAddBlacklistItem} className="cursor-pointer">{t('add_button')}</Button>
                                 </div>
-                            )}
+                                {blacklist.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 pt-2">
+                                        {blacklist.map(item => (
+                                            <Badge key={item} variant="secondary" className="flex items-center gap-1">
+                                                {item}
+                                                <button onClick={() => handleRemoveBlacklistItem(item)} className="rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer">
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label>{t('sound_effect_label')}</Label>
+                                <Select value={soundEffect} onValueChange={(value: SoundEffect) => setSoundEffect(value)}>
+                                    <SelectTrigger className="w-[180px] cursor-pointer">
+                                        <SelectValue placeholder={t('sound_effect_label')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none" className="cursor-pointer">{t('sound_effect_none')}</SelectItem>
+                                        <SelectItem value="pop" className="cursor-pointer">{t('sound_effect_pop')}</SelectItem>
+                                        <SelectItem value="applause" className="cursor-pointer">{t('sound_effect_applause')}</SelectItem>
+                                        <SelectItem value="firework" className="cursor-pointer">{t('sound_effect_firework')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label>{t('language')}</Label>
+                                <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
+                                    <SelectTrigger className="w-[180px] cursor-pointer">
+                                        <SelectValue placeholder={t('language')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="zh" className="cursor-pointer">{t('language_zh')}</SelectItem>
+                                        <SelectItem value="zh-TW" className="cursor-pointer">{t('language_zh_tw')}</SelectItem>
+                                        <SelectItem value="en" className="cursor-pointer">{t('language_en')}</SelectItem>
+                                        <SelectItem value="ja" className="cursor-pointer">{t('language_ja')}</SelectItem>
+                                        <SelectItem value="ko" className="cursor-pointer">{t('language_ko')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="space-y-2 pt-4 border-t">
+                                <Button variant="ghost" className="w-full justify-start gap-2 cursor-pointer" onClick={handleShowGuide}>
+                                    <HelpCircle className="h-4 w-4" /> {t('show_guide')}
+                                </Button>
+                                <Button variant="ghost" className="w-full justify-start gap-2 cursor-pointer" onClick={() => handleShowLegalDoc('privacy')}>
+                                    <ShieldCheck className="h-4 w-4" /> {t('privacy_policy')}
+                                </Button>
+                                <Button variant="ghost" className="w-full justify-start gap-2 cursor-pointer" onClick={() => handleShowLegalDoc('terms')}>
+                                    <FileBadge className="h-4 w-4" /> {t('terms_of_service')}
+                                </Button>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground text-center pt-4">
+                                v2.0.0<br />
+                                {t('about_author')} aiwandiannaodelele/龚奕帆 <br /> {t('mit_license')}
+                            </p>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <Label>{t('sound_effect_label')}</Label>
-                            <Select value={soundEffect} onValueChange={(value: SoundEffect) => setSoundEffect(value)}>
-                                <SelectTrigger className="w-[180px] cursor-pointer">
-                                    <SelectValue placeholder={t('sound_effect_label')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none" className="cursor-pointer">{t('sound_effect_none')}</SelectItem>
-                                    <SelectItem value="pop" className="cursor-pointer">{t('sound_effect_pop')}</SelectItem>
-                                    <SelectItem value="applause" className="cursor-pointer">{t('sound_effect_applause')}</SelectItem>
-                                    <SelectItem value="firework" className="cursor-pointer">{t('sound_effect_firework')}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <Label>{t('language')}</Label>
-                            <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
-                                <SelectTrigger className="w-[180px] cursor-pointer">
-                                    <SelectValue placeholder={t('language')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="zh" className="cursor-pointer">{t('language_zh')}</SelectItem>
-                                    <SelectItem value="en" className="cursor-pointer">{t('language_en')}</SelectItem>
-                                    <SelectItem value="ja" className="cursor-pointer">{t('language_ja')}</SelectItem>
-                                    <SelectItem value="ko" className="cursor-pointer">{t('language_ko')}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <p className="text-xs text-muted-foreground text-center pt-4">
-                            v2.0.0<br />
-                            {t('about_author')} aiwandiannaodelele/龚奕帆 <br /> {t('mit_license')}
-                        </p>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                    </DialogContent>
+                </Dialog>
+            </div>
 
             <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
                 <AlertDialogContent>
@@ -393,6 +490,17 @@ export default function Page(): React.ReactElement {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <OnboardingGuide 
+                open={isGuideOpen} 
+                onOpenChange={setIsGuideOpen}
+                onFinish={() => setHasOnboarded(true)}
+            />
+            <LegalDocs 
+                open={isLegalDocOpen} 
+                onOpenChange={setIsLegalDocOpen}
+                docType={activeLegalDoc}
+            />
         </div>
     );
 }

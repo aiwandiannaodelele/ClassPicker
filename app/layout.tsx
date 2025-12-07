@@ -8,8 +8,17 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     const { language, t } = useLanguage();
 
     useEffect(() => {
+        const newTitle = t('title');
+        
+        // Set web page title
         document.documentElement.lang = language;
-        document.title = t('title');
+        document.title = newTitle;
+
+        // Set Tauri window title if in Tauri environment
+        if (window.__TAURI__?.window) {
+            const appWindow = window.__TAURI__.window.getCurrentWindow();
+            appWindow.setTitle(newTitle);
+        }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
