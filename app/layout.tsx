@@ -1,10 +1,14 @@
-'use client'
+// Use 'use client' for client-side-only logic, but keep the layout itself a Server Component.
+'use client'; 
+
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { useEffect } from "react";
+import { inter, ebGaramond, jetbrainsMono } from "@/lib/fonts";
 
-function AppLayout({ children }: { children: React.ReactNode }) {
+// A new component to handle client-side effects after the language is ready.
+function AppInitializer({ children }: { children: React.ReactNode }) {
     const { language, t } = useLanguage();
 
     useEffect(() => {
@@ -20,6 +24,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             appWindow.setTitle(newTitle);
         }
 
+        // Service Worker registration can also be here.
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
                 .register("/sw.js")
@@ -28,13 +33,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         }
     }, [language, t]);
 
-    return (
-        <html lang={language} suppressHydrationWarning>
-            <body className={cn("font-sans antialiased")}>
-                {children}
-            </body>
-        </html>
-    );
+    // This component doesn't render anything itself, it just runs effects.
+    return <>{children}</>;
 }
 
 export default function RootLayout({
@@ -43,8 +43,18 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <LanguageProvider>
-            <AppLayout>{children}</AppLayout>
-        </LanguageProvider>
+        // The HTML and BODY tags are the best place to apply font variables.
+        <html lang="en" suppressHydrationWarning className={cn(inter.variable, ebGaramond.variable, jetbrainsMono.variable)}>
+            <body>
+                <LanguageProvider>
+                    {/* The Initializer wraps the children to get access to the language context. */}
+                    <AppInitializer>
+                        <main className={cn("font-sans antialiased")}>
+                            {children}
+                        </main>
+                    </AppInitializer>
+                </LanguageProvider>
+            </body>
+        </html>
     );
 }

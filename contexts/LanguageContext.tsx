@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { translations, Language } from '@/lib/i18n';
 
 // This function runs once to determine the initial language.
@@ -18,7 +18,6 @@ const getInitialLanguage = (): Language => {
   // 2. Detect browser language and map it to a supported language.
   const browserLang = window.navigator.language;
 
-  // Map browser language to supported languages
   if (browserLang.startsWith('zh')) {
     if (browserLang.toLowerCase() === 'zh-tw' || browserLang.toLowerCase() === 'zh-hk') {
       return 'zh-TW';
@@ -48,7 +47,13 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  const [language, setLanguage] = useState<Language>('en'); // Start with a non-null default
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setLanguage(getInitialLanguage());
+    setIsMounted(true);
+  }, []);
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
@@ -61,14 +66,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const currentLangSet = translations[language] as { [key: string]: any };
     const fallbackLangSet = translations.en as { [key: string]: any };
 
-    let translation = currentLangSet[key];
+    let translation = currentLangSet?.[key];
 
-    // Fallback to English if the key doesn't exist in the current language
     if (translation === undefined) {
-      translation = fallbackLangSet[key];
+      translation = fallbackLangSet?.[key];
     }
     
-    // If still not found, return the key itself
     if (translation === undefined) {
       return key;
     }
@@ -78,6 +81,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
     return String(translation);
   };
+
+  if (!isMounted) {
+    // On the server, and on the initial client render, return a blank screen.
+    // This prevents the hydration mismatch.
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
