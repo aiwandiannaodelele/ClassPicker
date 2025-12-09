@@ -168,6 +168,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* 16px at 1440px viewport, scales down to 12px at 375px viewport */
+    font-size: clamp(0.8rem, 0.6rem + 1.25vmin, 1.125rem);
+  }
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);

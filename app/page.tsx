@@ -259,7 +259,7 @@ export default function Page(): React.ReactElement {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 select-none" onContextMenu={(e) => e.preventDefault()}>
+        <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-2 select-none" onContextMenu={(e) => e.preventDefault()}>
             <main className="w-full max-w-sm sm:max-w-md">
                 <Card className="border-none shadow-none">
                     <CardContent className="space-y-6 pt-6">
@@ -299,7 +299,7 @@ export default function Page(): React.ReactElement {
                                 <TabsTrigger value="list" disabled={isRunning} className="cursor-pointer"><Users className="h-4 w-4 mr-2" />{t('list_mode_tab')}</TabsTrigger>
                             </TabsList>
                             <TabsContent value="id" className="mt-4 space-y-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between flex-wrap">
                                     <Label htmlFor="maxId" className="flex items-center gap-2">
                                         <Hash className="h-4 w-4" /> {t('id_range_label', maxId)}
                                     </Label>
