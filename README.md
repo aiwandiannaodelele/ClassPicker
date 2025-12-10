@@ -85,6 +85,23 @@
 3.  **部署**
     将 `out` 文件夹中的所有内容上传到您选择的任何静态托管服务即可。
 
+## 🐳 Docker
+
+如果您已安装 Docker，可以轻松地使用 Docker Compose 构建和运行应用。
+
+1.  **构建并启动容器**
+    ```bash
+    docker-compose up --build
+    ```
+
+2.  **访问应用**
+    在浏览器中打开 `http://localhost:3000`。
+
+3.  **停止容器**
+    ```bash
+    docker-compose down
+    ```
+
 ## 🛠️ 项目结构
 
 ```
