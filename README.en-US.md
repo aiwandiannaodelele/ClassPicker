@@ -39,7 +39,6 @@
     - **Dual Mode Selection**: Supports both **student ID range** and **TXT file roster import** modes.
     - **Advanced Options**: Provides advanced features like "Instant Mode" and "No Repeats".
     - **Multi-language Support**: Built-in **Simplified Chinese** and **English** switching, with easy extensibility for more languages.
-- **Smooth Animations**: Integrates subtle and elegant loading animations and hover effects to enhance the overall user experience.
 - **Static Export**: Supports full static export, making it easy to deploy to any static website hosting platform (e.g., Vercel, GitHub Pages, Netlify, etc.).
 
 ## 🚀 Quick Start
