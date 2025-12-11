@@ -466,7 +466,7 @@ export default function Page(): React.ReactElement {
                             </div>
 
                             <p className="text-xs text-muted-foreground text-center pt-4">
-                                v2.0.0<br />
+                                v2.0.0 ({process.env.NEXT_PUBLIC_BUILD_ID?.slice(0, 7)})<br />
                                 {t('about_author')} aiwandiannaodelele/龚奕帆 <br /> {t('mit_license')}
                             </p>
                         </div>
