@@ -1,4 +1,3 @@
-// Use 'use client' for client-side-only logic, but keep the layout itself a Server Component.
 'use client'; 
 
 import "./globals.css";
