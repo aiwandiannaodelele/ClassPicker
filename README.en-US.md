@@ -33,12 +33,12 @@
 
 ## ✨ Core Features
 
-- **Modern Tech Stack**: Built with **Next.js** (App Router), **React**, and **TypeScript**, ensuring project mastertainability and scalability.
+- **Modern Tech Stack**: Built with **Next.js** (App Router), **React**, and **TypeScript**, ensuring project maintainability and scalability.
 - **Elegant UI**: Carefully crafted with **shadcn/ui** and **Tailwind CSS** to deliver a beautiful, consistent, and responsive user interface.
 - **Powerful Functionality**:
-    - **Dual Mode Selection**: Supports both **student ID range** and **TXT file roster import** modes.
-    - **Advanced Options**: Provides advanced features like "Instant Mode" and "No Repeats".
-    - **Multi-language Support**: Built-in **Simplified Chinese** and **English** switching, with easy extensibility for more languages.
+    - **Dual Mode Selection**: Supports both **student ID range** and **TXT file roster import** modes for flexible data input.
+    - **Advanced Options**: Provides practical advanced features like "Instant Mode" and "No Repeats" to enhance usability.
+    - **Multi-language Support**: Built-in support for multi-language switching, with easy extensibility for adding more languages.
 - **Static Export**: Supports full static export, making it easy to deploy to any static website hosting platform (e.g., Vercel, GitHub Pages, Netlify, etc.).
 
 ## 🚀 Quick Start
@@ -128,7 +128,6 @@ If you have Docker installed, you can easily build and run the application using
 │   ├── sw.js             # Service Worker file
 │   ├── sounds/           # Sound effect files
 │   └── ...               # Other static images, icons, etc.
-├── 教程/                 # Project related tutorials and documentation (Chinese for "Tutorials")
 ├── next.config.ts        # Next.js configuration file
 ├── tailwind.config.ts    # Tailwind CSS configuration file
 ├── tsconfig.json         # TypeScript configuration file
@@ -138,7 +137,7 @@ If you have Docker installed, you can easily build and run the application using
 
 ## 📄 License
 
-This project is licensed under the [MIT License](./LICENSE). Contributions and suggestions are welcome!
+This project is licensed under the [AGPL v3 license](./LICENSE). Contributions and suggestions are welcome!
 
 ---
 
